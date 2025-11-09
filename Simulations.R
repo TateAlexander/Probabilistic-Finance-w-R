@@ -7,7 +7,7 @@ sim_rw <- function(init_cap, betting_amt){
   returns <- rnorm(rounds, 0.01,0.05)
   capital <- numeric(rounds + 1)
   capital[1] <- init_cap
-  bets = numeric(rounds+1)
+  bets <- numeric(rounds+1)
   bets[1] <- init_cap * betting_amt
   
   for(i in 1:rounds){
@@ -26,4 +26,5 @@ hist(res)
 
 # What is the probability of having more than 3 consecutive down days?
 # What is the probability od having at least 15 up days in one month (20 trading days)?
+
 
