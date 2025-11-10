@@ -65,3 +65,42 @@ opt_betting_amt <- function(ba){
 drawDowns <- opt_betting_amt(betting_amts)
 
 plot(betting_amts, drawDowns)
+
+#---------------------------------------------------------------
+rounds <- 500
+prob_winning <- 0.5
+# How much should I bet to minimize total capital draw-down and long run expected profit
+
+# Computes the ratio of expected return / pr( max draw down <= 0.1)
+sim_rw <- function(init_cap, betting_amt){
+  returns <- sample(c(2, 0.5), rounds, replace = TRUE, prob = c(prob_winning, 1-prob_winning))
+  capital <- numeric(rounds + 1)
+  capital[1] <- init_cap
+  bets <- numeric(rounds+1)
+  bets[1] <- init_cap * betting_amt
+  
+  for(i in 1:rounds){
+    change <- bets[i] * returns[i]
+    capital[i+1] <- (capital[i] - bets[i]) + change
+    bets[i+1] <- capital[i+1] * betting_amt
+  }
+  
+  c(min(capital), capital[length(capital)])
+}
+
+betting_amts <- seq(0.05, 1, by = 0.01)
+
+opt_betting_amt <- function(ba){
+  opt <- numeric(length(ba))
+  
+  for (i in 1:length(ba)){
+    res <-replicate(10000, sim_rw(1, ba[i]))
+    dd_prob <- mean((res[1, ] <= 0.1))
+    expected_gain <- mean(res[2, ])
+    opt[i] <- expected_gain / dd_prob
+  }
+  opt
+}
+drawDowns <- opt_betting_amt(betting_amts)
+
+plot(betting_amts, drawDowns)
